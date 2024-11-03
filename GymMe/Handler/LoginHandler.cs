@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.UI;
 
 namespace GymMe.Handler
 {
@@ -16,20 +17,9 @@ namespace GymMe.Handler
         {
             user = userRepository.getUserByUsername(username);
 
-            // Validasi Username dan Password
-            if (string.IsNullOrEmpty(username))
-            {
-                return "Username cannot be empty!";
-            }
-            else if (username.Length < 5 || username.Length > 15)
-            {
-                return "Username must be between 5 and 15 characters long!";
-            }
-            else if (string.IsNullOrEmpty(password))
-            {
-                return "Password cannot be empty!";
-            }
-            else if (user == null)
+            user = userRepository.getUserByUsername(username);
+
+            if (user == null)
             {
                 return "User not found !!";
             }
@@ -40,5 +30,12 @@ namespace GymMe.Handler
 
             return string.Empty; // No error
         }
-    }
+
+        public int getUserId(string username)
+        {
+            MsUser user = userRepository.getUserByUsername(username);
+            int userId = user.UserID;
+            return userId;
+        }
+    }   
 }

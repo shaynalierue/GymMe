@@ -1,4 +1,6 @@
-﻿using GymMe.Models;
+﻿using GymMe.Controller;
+using GymMe.Models;
+using GymMe.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +13,17 @@ namespace GymMe.Views
 {
     public partial class HomePage : System.Web.UI.Page
     {
-        Database1Entities1 db = new Database1Entities1 ();
+        UserController UserController = new UserController ();
         protected void Page_Load(object sender, EventArgs e)
         {
-                       
+
+            if (!IsPostBack)
+            {
+                List<MsUser> list = UserController.GetUsers();
+                UserList.DataSource = list;
+                UserList.DataBind();
+            }
+
             if (Session["user"] == null && Request.Cookies["user_cookie"] == null)
             {
                 Response.Redirect("~/Views/LoginPage.aspx");
@@ -26,7 +35,7 @@ namespace GymMe.Views
                 if (Session["user"] == null)
                 {
                     var id = Convert.ToInt32(Request.Cookies["user_cookie"].Value);
-                    user = (from x in db.MsUsers where x.UserID == id select x).FirstOrDefault();
+                    user = UserController.GetUserById(id);
                     Session["user"] = user;
                 }
                 else
@@ -39,13 +48,19 @@ namespace GymMe.Views
                 {
                     AdminNavbar.Visible = true;
                     CustomerNavBar.Visible = false;
-                    RoleLbl.Text = "Current Role : [Admin]";
+                    CustomerContent.Visible = false;
+                    Label1.Text = "Current Role : [Admin]";
+                    List<MsUser> list = UserController.GetUsers();
+                    UserList.DataSource = list;
+                    UserList.DataBind();
              
                 }
                 else if (user.UserRole == "Customer")
                 {
                     AdminNavbar.Visible = false;
                     CustomerNavBar.Visible = true;
+                    CustomerContent.Visible = true;
+                    AdminContent.Visible = false;
                     RoleLbl.Text = "Current Role : [Customer]";
                 }
                 else if (user.UserRole == "Guest") // Klo Guest ...
